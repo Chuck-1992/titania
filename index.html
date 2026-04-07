@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+
+
+    <div class="container mt-5">
+
+
+        <div class="d-flex justify-content-start">
+            <button class="btn btn-danger" onclick="cargarVehiculosTodos()">Cargar vehículos</button>
+
+            <select name="" id="select_type">
+                <option value="Todos">Todos</option>
+                <option value="OK">OK</option>
+                <option value="Riesgo">Riesgo</option>
+                <option value="Crítico">Crítico</option>
+            </select>
+        </div>
+
+
+    </div>
+
+
+    <table class="table mt-5" id="table_vehiculo">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Placa</th>
+                <th scope="col">velocidad</th>
+                <th scope="col">Alerta</th>
+            </tr>
+        </thead>
+        <tbody id="table_vehiculo_detalle">
+
+
+
+        </tbody>
+    </table>
+
+
+    <script>
+
+
+
+        if (!localStorage.getItem("vehiculos")) {
+
+            let vehiculosStorage = [{ "placa": "AAA111", "velocidad": 40 }, { "placa": "BBB222", "velocidad": 90 }, { "placa": "CCC333", "velocidad": 120 }]
+            localStorage.setItem("vehiculos", JSON.stringify(vehiculosStorage));
+
+        }
+
+
+        let table_vehiculo = document.getElementById("table_vehiculo");
+        let table_vehiculo_detalle = document.getElementById("table_vehiculo_detalle");
+
+
+        let select_type = document.getElementById("select_type");
+
+        select_type.addEventListener("change", function () {
+
+            var selectedOption = this.options[select_type.selectedIndex];
+
+            cargarVehiculos(selectedOption.text)
+
+        });
+
+
+
+        
+        async function cargarVehiculosTodos() {
+
+            let vehiculos = localStorage.getItem("vehiculos");
+            let vehiculosResult = [];
+
+
+            table_vehiculo_detalle.innerHTML = ``;
+
+
+            if (typeof vehiculos === "string") {
+                vehiculosResult = JSON.parse(vehiculos);
+            }
+
+            const apiSimulada = () => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({
+                            json: () => Promise.resolve(vehiculosResult),
+                        });
+                    }, 1000);
+                });
+            };
+
+
+            await apiSimulada()
+                .then(response => response.json())
+                .then(data => {
+
+                    let estadoVelocidad = ""
+
+                    for (let index = 0; index < data.length; index++) {
+
+                        const vehiculos = data[index];
+
+                        let placa = vehiculos.placa;
+                        let velocidad = vehiculos.velocidad;
+
+                        if (velocidad >= 100) {
+                            estadoVelocidad = "CRÍTICO"
+                        }
+
+                        else if (velocidad <= 80) {
+                            estadoVelocidad = "OK"
+
+                        }
+
+
+                        else if (velocidad >= 80 && velocidad < 100) {
+
+                            estadoVelocidad = "RIESGO"
+                        }
+
+
+                        table_vehiculo_detalle.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${placa}</td>
+                            <td>${velocidad}</td>
+                            <td>${estadoVelocidad}</td>
+                        </tr>
+                        `;
+
+
+
+                    }
+
+
+                });
+
+
+
+
+
+
+        }
+
+
+
+
+        async function cargarVehiculos(alerta) {
+
+            let vehiculos = localStorage.getItem("vehiculos");
+            let vehiculosResult = [];
+            let psoitionDataOK = {}
+            let psoitionDataCR = {}
+            let psoitionDataRI = {}
+
+
+            table_vehiculo_detalle.innerHTML = ``;
+
+
+            if (typeof vehiculos === "string") {
+                vehiculosResult = JSON.parse(vehiculos);
+            }
+
+            const apiSimulada = () => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({
+                            json: () => Promise.resolve(vehiculosResult),
+                        });
+                    }, 1000);
+                });
+            };
+
+
+            await apiSimulada()
+                .then(response => response.json())
+                .then(data => {
+
+                    let estadoVelocidad = ""
+
+                    for (let index = 0; index < data.length; index++) {
+
+                        const vehiculos = data[index];
+
+                        let placa = vehiculos.placa;
+                        let velocidad = vehiculos.velocidad;
+
+                        if (velocidad >= 100) {
+                            estadoVelocidad = "CRÍTICO"
+                            psoitionDataCR = data[index];
+                        }
+
+                        else if (velocidad <= 80) {
+                            estadoVelocidad = "OK"
+                            psoitionDataOK = data[index];
+
+                        }
+
+                        else if (velocidad >= 80 && velocidad < 100) {
+
+                            estadoVelocidad = "RIESGO"
+                            psoitionDataRI = data[index];
+                        }
+
+
+
+                    }
+
+
+
+
+
+                    if (alerta.toUpperCase() === "OK") {
+
+                        table_vehiculo_detalle.innerHTML += `
+                            <tr>
+                                <td>${1}</td>
+                                <td>${psoitionDataOK.placa}</td>
+                                <td>${psoitionDataOK.velocidad}</td>
+                                <td>${alerta.toUpperCase()}</td>
+                            </tr>
+                            `;
+
+                    } else if (alerta.toUpperCase() === "CRÍTICO") {
+
+
+                        console.log(psoitionDataCR);
+
+                        table_vehiculo_detalle.innerHTML += `
+                            <tr>
+                                <td>${1}</td>
+                                <td>${psoitionDataCR.placa}</td>
+                                <td>${psoitionDataCR.velocidad}</td>
+                                <td>${alerta.toUpperCase()}</td>
+                            </tr>
+                            `;
+
+
+                    }
+
+                    else if (alerta.toUpperCase() === "RIESGO") {
+
+                        table_vehiculo_detalle.innerHTML += `
+                            <tr>
+                                <td>${1}</td>
+                                <td>${psoitionDataRI.placa}</td>
+                                <td>${psoitionDataRI.velocidad}</td>
+                                <td>${alerta.toUpperCase()}</td>
+                            </tr>
+                            `;
+
+                    }
+
+                    else {
+
+                        cargarVehiculosTodos();
+
+                    }
+
+
+
+
+                });
+
+
+
+
+
+
+        }
+
+
+
+
+
+    </script>
+
+
+</body>
+
+</html>
