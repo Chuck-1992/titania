@@ -50,7 +50,7 @@
     <script>
 
 
-
+        // Cargar la data inicial para simuualr la base de datos
         if (!localStorage.getItem("vehiculos")) {
 
             let vehiculosStorage = [{ "placa": "AAA111", "velocidad": 40 }, { "placa": "BBB222", "velocidad": 90 }, { "placa": "CCC333", "velocidad": 120 }]
@@ -59,12 +59,13 @@
         }
 
 
+        // Declaración de Variables
         let table_vehiculo = document.getElementById("table_vehiculo");
         let table_vehiculo_detalle = document.getElementById("table_vehiculo_detalle");
-
-
         let select_type = document.getElementById("select_type");
 
+
+        // Método para el select y el tipo de solicitud
         select_type.addEventListener("change", function () {
 
             var selectedOption = this.options[select_type.selectedIndex];
@@ -75,7 +76,7 @@
 
 
 
-        
+        // Método para cargar todos los vehiculos
         async function cargarVehiculosTodos() {
 
             let vehiculos = localStorage.getItem("vehiculos");
@@ -89,6 +90,7 @@
                 vehiculosResult = JSON.parse(vehiculos);
             }
 
+            // Simular promesa HTTP
             const apiSimulada = () => {
                 return new Promise((resolve) => {
                     setTimeout(() => {
@@ -99,7 +101,7 @@
                 });
             };
 
-
+            // Espera la respuesta de la solicitud y procesa la informacion
             await apiSimulada()
                 .then(response => response.json())
                 .then(data => {
@@ -154,6 +156,7 @@
 
 
 
+        // Método para los filtros de información
 
         async function cargarVehiculos(alerta) {
 
@@ -278,7 +281,6 @@
 
 
         }
-
 
 
 
